@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <style type="text/css">
+  html{
+    color:#FFF;
+    font-family: sans-serif;
+  }
+  body{
+    background:#000;
+  }
+  a:visited{
+    color:inherit;
+  }
+  .wrapper{
+    margin:auto;
+    width:800px;
+    text-align: center;
+  }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <div data-role='screen'>
+      <h2>
+        <span data-role="screen-type">320x480</span> <a  data-role='button-portrait' href='#'>portrait</a> | <a href="#" data-role='button-paysage'>paysage</a> 
+      </h2>
+      <div><a data-role='button-reload' href="#">reload</a></div>
+      <iframe id='frame' data-role='frame' src="index.html" width="320" height="480" frameborder="0"></iframe></div>
+    </div>
+    <script type="text/javascript">
+    var resolution,portrait,paysage,reload,frame,reloadview;
+    resolution = {
+      portrait:{
+        width:320,height:480
+      },
+      paysage:{
+        width:480,height:320
+      }
+    }
+    portrait = document.querySelector('a[data-role="button-portrait"]');
+    paysage = document.querySelector('a[data-role="button-paysage"]');
+    reload=document.querySelector('a[data-role="button-reload"]');
+    frame = document.querySelector('#frame')
+
+    var switchPortrait = function(){
+      frame.width  =resolution.portrait.width;
+      frame.height  =resolution.portrait.height;
+    }
+
+    var switchPaysage = function(){
+      frame.width  =resolution.paysage.width;
+      frame.height  =resolution.paysage.height;
+    }
+
+    reloadview=function(iframe){
+      src = iframe.src;
+      iframe.src = null;
+      iframe.src = src ;
+    }
+
+    portrait.addEventListener('click',function(){
+      switchPortrait();
+    })
+    paysage.addEventListener('click',function(){
+      switchPaysage();
+    })
+    reload.addEventListener('click',function(){
+      reloadview(frame);
+    })
+    </script>
+  </body>
+
+  </html>

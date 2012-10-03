@@ -1,0 +1,159 @@
+/**
+styles
+**/
+html{
+	height: 100%;
+}
+body{
+	font-family:'Droid Sans', Tahoma, Geneva, sans-serif;
+	font-size:100%;
+	background:#333;
+	padding-left:8px;
+	padding-right:8px;
+	height: 100%;
+}
+h1{
+	font-size: 2em;
+}
+h2{
+font-size: 1.8em;
+}
+h3{
+font-size: 1.6em;
+}
+h4{
+font-size: 1.4em;
+}
+h5{
+	font-size: 1.2em;
+}
+h6{
+	font-size: 1em;
+}
+.fixed{
+	position: fixed;
+}
+.top{
+	top:0;
+}
+.bottom{
+	bottom: 0;
+}
+.full-width{
+	width: 100%;
+}
+.center{
+	text-align: center;
+}
+.vertical-center{
+	line-height: normal;
+	vertical-align: middle;
+}
+.block{
+	height:40px;
+}
+.block2{
+	height:80px;
+}
+.cartidge{
+	background:#EEE;
+	border-radius:5px 5px;
+	padding:3px;
+	margin:0;
+	margin-top: 10px;
+	-webkit-box-shadow:1px 1px 5px #333;
+}
+.profile{
+	font-size:0.9em;
+}
+.profile-header{
+	margin-top:0;
+	background:-webkit-gradient(linear,left bottom,left top,from(#222),to(#666));
+	border-top:1px solid #777;
+	color:#FFFFFF;
+	text-align:center;
+	vertical-align:middle;
+	z-index: 200;
+	border-bottom-left-radius:8px 8px;
+	border-bottom-right-radius:8px 8px;
+	color:#FFF;
+}
+.profile-footer{
+	line-height: 100%;
+	text-align:center;
+	color:#FFF;
+	font-size: 1em;
+	vertical-align: middle;
+	background: -webkit-gradient(linear,left bottom,left top,from(#000),to(#333));
+}
+img{
+	vertical-align:top;
+}
+.gallery{
+	margin-top:10px;
+}
+.footer{
+}
+.gallery img{
+	width:94%;
+	margin:3%;
+	padding: 0;
+	border: 1px solid #FFF;
+	box-shadow: 2px 2px 2px #333;
+}
+.profile-picture{
+	
+	width: 60px;
+
+
+}
+
+.cell1{
+	width:12.5%;
+	display:inline-block;
+}
+.cell2{
+	width:25%;
+	display:inline-block;
+	float:left;
+
+}
+.cell3{
+	width:37.5%;
+	display:inline-block;
+
+}
+.cell4{
+	width:50%;
+	display:inline-block;
+
+}
+.cell5{
+	width:62.5%;
+	display:inline-block;
+
+}
+.cell6{
+	width:75%;
+	display:inline-block;
+
+}
+.cell7{
+	width:87.5%;
+	display:inline-block;
+
+}
+.cell8{
+	width:100%;
+	display:inline-block;
+
+}
+.row{
+	position:relative;
+	overflow:hidden;
+}
+.row>div{
+
+	/**background:#F00;**/
+	
+}
