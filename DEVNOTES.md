@@ -1,4 +1,6 @@
 #DEVNOTES
+
+##Notes de développement de l'application spectragram
 @note  @android utiliser phonegap , android, eclipse , adb ,android x86 , virtualbox 
 ###Installer , configurer android x86
 @note @phonegap installer android x86
@@ -46,7 +48,7 @@ Les namespaces définis suivent l'architecture du répertoire courant :
   dans le dossier racine du projet
 
 #####Models
-+ générer un model via le clt(command line tool):
++ générer un model via le clt(command line tool):<br/>
  <code>
  sencha generate model NomDuModel key1:type,...
  </code>
