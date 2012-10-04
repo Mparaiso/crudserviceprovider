@@ -1,5 +1,7 @@
 Ext.define("spectragram.view.Main", {
-    extend: 'Ext.tab.Panel',
+    extend: 'Ext.tab.Panel',// Panel : un panel de vues.
+    xtype:"mainview",
+    id:'mainview',
     requires: [
     'Ext.TitleBar',
     'Ext.Video'
@@ -12,7 +14,10 @@ Ext.define("spectragram.view.Main", {
             xtype:"homeview"
         },
         {
-            xtype:"blogview"
+            xtype:"tweetlist"
+        },
+        {
+            xtype:"searchform"
         },
         {
             xtype:'contactview'

@@ -40,6 +40,17 @@ le script app.js est appelé par le loader situé dans sdk/microloader/developme
 Les namespaces définis suivent l'architecture du répertoire courant :
 + exemple "myapp.view.Home" se situe dans app/view/Home.js
 
+#####Controllers
++ générer un controlleur à l'aide du Command Line Tool : 
+  sencha generate controller <NomDuController>
+  dans le dossier racine du projet
+
+#####Models
++ générer un model via le clt(command line tool):
+ <code>
+ sencha generate model NomDuModel key1:type,...
+ </code>
+
 #####Views
 Pour créer une vue , 3 choses : 
 + déclarer la vue dans app.js
@@ -50,7 +61,7 @@ Pour créer une vue , 3 choses :
 #####Styles
 Pour ajouter une classe à un composant
 + dans sa définition , dans config ajouter le parametre ***cls*** avec le nome de la classe
-+ créer le style associé quelque part
++ créer le style associé quelque part.
 
 #####Formulaires
 + les champs de formulaires peuvent etre contenus dans des vues ou dans des fieldsets (xtype:'fieldset')
@@ -61,3 +72,5 @@ Pour ajouter une classe à un composant
 
 #####Ajax
 + voir app/view/Blog.js pour un exemple ajax
+
+

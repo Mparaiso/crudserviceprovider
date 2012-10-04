@@ -1,11 +1,15 @@
 Ext.application({
+    models: ["Main"],
+
+    controllers: ["Main"],
+
     name: 'spectragram',
 
     requires: [
         'Ext.MessageBox'
     ],
 
-    views: ['Main',"Home","Blog","Contact"],
+    views: ['Main',"Home","Tweets","Search","Contact"],
 
     icon: {
         '57': 'resources/icons/Icon.png',
