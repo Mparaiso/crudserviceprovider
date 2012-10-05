@@ -1,15 +1,15 @@
 Ext.application({
-    models: ["Main"],
-
+    models: ["Search"],
+    stores: ['Searches'],
     controllers: ["Main"],
 
     name: 'spectragram',
 
     requires: [
-        'Ext.MessageBox'
+    'Ext.MessageBox'
     ],
 
-    views: ['Main',"Home","Tweets","Search","Contact"],
+    views: ['Main',"Tweets","Search"],
 
     icon: {
         '57': 'resources/icons/Icon.png',
@@ -46,6 +46,6 @@ Ext.application({
                     window.location.reload();
                 }
             }
-        );
+            );
     }
 });

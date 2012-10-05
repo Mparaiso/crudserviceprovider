@@ -11,11 +11,11 @@
     scrollable:true,
     styleHtmlContent:true,
     html:[
-    "<h1>Welcome to home</h1>",
-    "<p>this is the home page</p>",
-    "<p>this is another paragraph</p>",
-    "<p>the text of this page is centered</p>",
-    "<p>the text of this page is gray</p>"
+    "<h1>Welcome to Twitter Client</h1>",
+    "<p>You can search for tweets",
+    "about topics you want , search keywords with the # symbol,",
+    "and search users with the @ symbol</p>",
+    "<p><b>Exemples: #mobile, #computer, #cloud, @johndoe, @janedone, ...</b></p>"
     ].join("")
   }
 });

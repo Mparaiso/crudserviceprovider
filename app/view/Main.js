@@ -3,24 +3,17 @@ Ext.define("spectragram.view.Main", {
     xtype:"mainview",
     id:'mainview',
     requires: [
-    'Ext.TitleBar',
-    'Ext.Video'
+    'Ext.TitleBar'
     ],
     config: {
         tabBarPosition: 'bottom',
 
         items: [
         {
-            xtype:"homeview"
-        },
-        {
-            xtype:"tweetlist"
-        },
-        {
             xtype:"searchform"
         },
         {
-            xtype:'contactview'
+            xtype:"tweetlist"
         }
         ]
     }

@@ -2,29 +2,47 @@
  * app/controller/Main.js
  * controller principal
  */
-Ext.define('spectragram.controller.Main', {
+ Ext.define('spectragram.controller.Main', {
     extend: 'Ext.app.Controller',
     
     config: {
         refs: {
-            main:"#mainview",
-            tweets:"tweetlist",
-            search:"searchform",
+            mainView:"mainview",
+            tweetList: "tweetlist list",
+            searchForm:"searchform",
+            searchField:"searchform searchfield",
             searchFormSendButton:"#searchFormSendButton" //récupere l'id d'un bouton
         },
         control: {
-            "tweetlist list":{
+            "tweetList": {
                 itemtap: 'showPost' //itemtap : event showpost : handler
             },
             "searchform button":{
-                tap:"searchFormAlert" // ajouter un handler sur le bouton référencé
+                tap:"onSearchFormSubmit" // ajouter un handler sur le bouton référencé
             }
         }
     },
+    /** handler **/
+    onSearchFormSubmit:function(widget,event,options){
+        var query = widget.up('panel').getValues().query;//@note @sencha obtenir les valeurs d'un Ext.form.Panel
+        var store = Ext.getStore("Searches");
+        //var index = store.find('query',query);
+        var model = store.add({query:query});
+        store.sync();
+        var tweetList = this.getTweetList();
+        var tweets = model[0].tweets();
+        tweetList.setStore(tweets);
+        tweets.load();
+        this.getMainView().animateActiveItem( 1, {type: 'slide', direction: 'right'} );
+        
+    },
+    onStoreLoad: function(records, operation, success){
+        console.log(records);
+        //var store = Ext.getStore("Searches");
+
+    },
     showPost:function(list,index,element,record){
-        //console.dir(element);
-        //console.dir(record);
-        this.getResults().push({
+        list.up("tweetlist").push({ // le controlleur a access à toute les vues de cette façon
             xtype:'panel',
             title:record.get('from_user_name'),
             data:record._data,
@@ -37,15 +55,7 @@ Ext.define('spectragram.controller.Main', {
             styleHtmlContent:true
         });
     },
-    searchFormAlert:function(){
-        //console.log("searchFormAlert");
-        //console.dir(this);
-        //this.config.refs.main.animateActiveItem(1);
-        //console.dir(this.getMain());
-        this.getMain().animateActiveItem(1,{type: 'slide', direction: 'right'});
-    }
     //called when the Application is launched, remove if not needed
     // launch: function(app) {
-
     // }
 });
