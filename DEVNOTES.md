@@ -75,4 +75,24 @@ Pour ajouter une classe à un composant
 #####Ajax
 + voir app/view/Blog.js pour un exemple ajax
 
+###Sencha tool
+
+####Construire pour la production 
+<code>sencha app build production</code>
+
+####Construire en natif pour Android
++ dans le fichier packager.json
+  + définir la variable sdkPath vers le chemin du sdk (ex : "C:\\Program Files\\Android\\android-sdk" )
+  + définir la variable plateform à "Android"
+  + un bug existe avec le sdk version 2.0.1 , pour packager une app avec le sdk , installer l'api level 7( android 2.1.X )
++ avec le cmd tool
+  <code>sencha app build nate</code>
+
+###CSS
+
+####Compass
+
+utiliser compass pour compiler les styles.
++ compass compile resources/sass/
+
 

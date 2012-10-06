@@ -5,7 +5,7 @@
 	 * This is the name of your application, which is displayed on the device when the app is installed. On IOS, this should match
 	 * the name of your application in the Apple Provisioning Portal.
 	 */
-	"applicationName":"My Application",
+	"applicationName":"spectragram",
 
 	/**
 	 * @cfg {String} applicationId
@@ -63,7 +63,7 @@
 	 *  - Android
 	 *  - AndroidEmulator
 	 */
-	"platform":"iOSSimulator",
+	"platform":"Android",
 
 	/**
 	 * @cfg {String} deviceType
@@ -103,14 +103,17 @@
 	 * @cfg {String} sdkPath
 	 * This is the path to the Android SDK, if you are developing an Android application.
 	 */
-	"sdkPath":"/path/to/android-sdk",
+	// "sdkPath":"/path/to/android-sdk",
+	"sdkPath":"C:\\Program Files\\Android\\android-sdk",
+
 	
 	/**
 	 * @cfg  androidAPILevel
 	 * This is android API level, the version of Android SDK to use, you can read more about it here: http://developer.android.com/guide/appendix/api-levels.html.
 	 * Be sure to install corresponding platform API in android SDK manager (android_sdk/tools/android)
 	 */
-	"androidAPILevel":"15",
+	"androidAPILevel":"8",
+	"target":"1",
 
 	/**
 	 * @cfg  orientations

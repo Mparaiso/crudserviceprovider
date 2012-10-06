@@ -37,7 +37,6 @@
         
     },
     onStoreLoad: function(records, operation, success){
-        console.log(records);
         //var store = Ext.getStore("Searches");
 
     },

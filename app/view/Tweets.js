@@ -17,6 +17,8 @@
   config: { // configuration de l'objet défini
   title:'Tweets',
   iconCls:'star',
+  emptyText: 'No tweets found.',
+  
   
   items:[{
     "xtype": 'list',

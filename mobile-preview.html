@@ -28,12 +28,17 @@
       <h2>
         <span data-role="screen-type">320x480</span> <a  data-role='button-portrait' href='#'>portrait</a> | <a href="#" data-role='button-paysage'>paysage</a> 
       </h2>
+      <form>
+        <label for="url">Url</label>
+        <input data-role='update-url' type="text" name="url" placeholder='http://file.url' id="">
+        <input data-role='update-url-button' type="button" name='' value="change location">
+      </form>
       <iframe id='frame' data-role='frame' src="index.html" width="320" height="480" frameborder="0"></iframe>
       <p><a data-role='button-reload' href="#">reload</a></p>
     </div>
   </div>
   <script type="text/javascript">
-  var resolution,portrait,paysage,reload,frame,reloadview;
+  var resolution,reloadview;
   resolution = {
     portrait:{
       width:320,height:480
@@ -42,26 +47,39 @@
       width:480,height:320
     }
   }
-  portrait = document.querySelector('a[data-role="button-portrait"]');
-  paysage = document.querySelector('a[data-role="button-paysage"]');
-  reload=document.querySelector('a[data-role="button-reload"]');
-  frame = document.querySelector('#frame')
+  var portrait = document.querySelector('a[data-role="button-portrait"]'),
+      paysage = document.querySelector('a[data-role="button-paysage"]'),
+      reload=document.querySelector('a[data-role="button-reload"]'),
+      frame = document.querySelector('#frame'),
+      urlButton = document.querySelector('input[data-role="update-url-button"]'),
+      url = document.querySelector('input[data-role="update-url"]'),
+      currentUrl = "index.html";
+
+  var navigateToUrl = function(){
+    if(currentUrl!=url.value){
+      frame.src = url.value;
+    }
+    return false;
+  };
 
   var switchPortrait = function(){
     frame.width  =resolution.portrait.width;
     frame.height  =resolution.portrait.height;
-  }
+  };
 
   var switchPaysage = function(){
     frame.width  =resolution.paysage.width;
     frame.height  =resolution.paysage.height;
-  }
+  };
 
   reloadview=function(iframe){
     src = iframe.src;
     iframe.src = null;
     iframe.src = src ;
   }
+  urlButton.addEventListener('click',function(event){
+    navigateToUrl();
+  });
 
   portrait.addEventListener('click',function(){
     switchPortrait();
