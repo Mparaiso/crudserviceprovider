@@ -17,13 +17,13 @@
     "silex/silex": "*"
   },
   "require": {
-    "php": ">=5.3.3"
+    "php": ">=5.3.3",
+     "doctrine/orm":"2.*"
   },
   "suggest": {},
   "autoload": {
     "psr-0": {
-      "Mparaiso": "src/",
-      "doctrine/orm":"2.*"
+      "Mparaiso": "src/"
     }
   }
 }
