@@ -1,6 +1,6 @@
 {
   "name": "mparaiso/crudserviceprovider",
-  "description": "CRUD helpers Silex framework",
+  "description": "CRUD helper Silex framework",
   "keywords": [
     "silex",
     "extensions"
