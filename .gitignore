@@ -1,0 +1,11 @@
+nbproject/private 
+nbproject/project.properties 
+nbproject/project.xml
+nbproject/*
+.settings/*
+.buildpath
+.idea/*
+vendor/*
+.project
+vendor
+

@@ -1,0 +1,28 @@
+{
+  "name": "mparaiso/crudserviceprovider",
+  "description": "CRUD helpers Silex framework",
+  "keywords": [
+    "silex",
+    "extensions"
+  ],
+  "homepage": "https://github.com/Mparaiso/crudserviceprovider",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "MParaiso",
+      "email": "mparaiso@online.fr"
+    }
+  ],
+  "require-dev": {
+    "silex/silex": "*"
+  },
+  "require": {
+    "php": ">=5.3.3"
+  },
+  "suggest": {},
+  "autoload": {
+    "psr-0": {
+      "Mparaiso": "src/"
+    }
+  }
+}
