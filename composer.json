@@ -6,7 +6,7 @@
     "extensions"
   ],
   "homepage": "https://github.com/Mparaiso/crudserviceprovider",
-  "license": "MIT",
+  "license": "GPL",
   "authors": [
     {
       "name": "MParaiso",
@@ -22,7 +22,8 @@
   "suggest": {},
   "autoload": {
     "psr-0": {
-      "Mparaiso": "src/"
+      "Mparaiso": "src/",
+      "doctrine/orm":"2.*"
     }
   }
 }
