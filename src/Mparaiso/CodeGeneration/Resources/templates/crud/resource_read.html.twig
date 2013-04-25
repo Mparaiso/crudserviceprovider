@@ -1,4 +1,4 @@
-<div class='Title'>Resource #{{ resource.id }}</div>
+<div class='Title'>Resource "{{ resource|default(resource.id) }}"</div>
 <div>
     <table class="span12">
         <tbody>
@@ -7,12 +7,17 @@
 
             <tr>
                 <td>
-                   {{ prop }} :
+                    {{ prop }} :
                 </td>
                 <td>
 <pre>
 <code>
-{{ attribute(resource,prop) }}
+    {% set _property= attribute(resource,prop) %}
+    {% if _property is datetime %}
+        {{ _property|date('r') }}
+    {% else %}
+        {{ _property }}
+    {% endif %}
 </code>
 </pre>
 

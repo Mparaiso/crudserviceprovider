@@ -19,21 +19,18 @@ class CrudServiceProvider implements ServiceProviderInterface
 
     public function register(Application $app)
     {
-        // FR : ajouter un chemin de templates à twig.path
-        if (is_Array($app["twig.path"])) {
-            $twigpath         = $app["twig.path"];
-            $twigpath[]       = __DIR__ . "/../CodeGeneration/Resources/templates/";
-            $app["twig.path"] = $twigpath;
-        } else {
-            $app["twig.path"] = $app->share(
-                $app->extend("twig.path", function ($path, $app) {
-                    $path[] = __DIR__ . "/../CodeGeneration/Resources/templates/";
-                    return $path;
-                }));
-        }
+
     }
 
     public function boot(Application $app)
     {
+        $app['twig.loader.filesystem']->addPath(
+            __DIR__ . "/../CodeGeneration/Resources/templates/");
+
+        $twigEnv = $app['twig'];
+        /* @var $twigEnv \Twig_Environment */
+        $twigEnv->addTest(new \Twig_SimpleTest("datetime", function ($value) {
+            return $value instanceof \DateTime;
+        }));
     }
 }

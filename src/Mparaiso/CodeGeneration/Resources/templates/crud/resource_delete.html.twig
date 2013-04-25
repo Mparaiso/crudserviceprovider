@@ -1,0 +1,7 @@
+<h3 class='Title'>Delete Resource "{{ resource|default(resource.id) }}"</h3>
+<h4>Please confirm deletion of resource "{{ resource|default(resource.id) }}"</h4>
+<form action="" method="POST" class="form-actions">
+    <input type="submit" value="Delete" class="btn">
+    <a class="btn" href="{{ path(resourceName~"_index") }}">Cancel</a>
+
+</form>

@@ -1,11 +1,12 @@
 <h3>Update {{ resourceName|default('resource') }}</h3>
 <div>
-    <form method="POST" >
+    <form method="POST" class=" form-actions" name="{{ form.vars.name }}">
         <div class="controls span12">
-        {{ form_widget(form,{"class":"input-block-level"}) }}
+            {{ form_widget(form,{"class":"input-block-level"}) }}
         </div>
-        <input class='btn'  type="submit" value="Update">
-        <input  class='btn' type="reset" value="Reset">
+        <input class='btn' type="submit" value="Update">
+        <input class='btn' type="reset" value="Reset">
+        <a class="btn" href="{{ path(resourceName~"_index") }}">Cancel</a>
     </form>
 </div>
 

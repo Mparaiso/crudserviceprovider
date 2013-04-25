@@ -3,6 +3,7 @@
     <form method="POST">
         {{ form_widget(form) }}
         <input class='btn' type="submit" value="Create">
-        <input class='btn'  type="reset" value="Reset">
+        <input class='btn' type="reset" value="Reset">
+        <a class="btn" href="{{ path(resourceName~"_index") }}">Cancel</a>
     </form>
 </div>
