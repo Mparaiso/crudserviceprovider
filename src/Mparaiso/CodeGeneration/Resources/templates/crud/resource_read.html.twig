@@ -1,3 +1,5 @@
+{% extends  layout  %}
+{% block mp_crud_content %}
 <div class='Title'>Resource "{{ resource|default(resource.id) }}"</div>
 <div>
     <table class="span12">
@@ -12,12 +14,12 @@
                 <td>
 <pre>
 <code>
-    {% set _property= attribute(resource,prop) %}
-    {% if _property is datetime %}
-        {{ _property|date('r') }}
-    {% else %}
-        {{ _property }}
-    {% endif %}
+{% set _property= attribute(resource,prop) %}
+{% if _property is datetime %}
+{{ _property|date('r') }}
+{% else %}
+{{ _property }}
+{% endif %}
 </code>
 </pre>
 
@@ -31,3 +33,4 @@
 <div>
     <a href="{{ path(resourceName~"_index") }}">{{ resourceName }} index</a>
 </div>
+{% endblock %}

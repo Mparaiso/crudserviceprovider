@@ -1,3 +1,5 @@
+{% extends  layout %}
+{% block mp_crud_content %}
 <h3>Update {{ resourceName|default('resource') }}</h3>
 <div>
     <form method="POST" class=" form-actions" name="{{ form.vars.name }}">
@@ -6,7 +8,7 @@
         </div>
         <input class='btn' type="submit" value="Update">
         <input class='btn' type="reset" value="Reset">
-        <a class="btn" href="{{ path(resourceName~"_index") }}">Cancel</a>
+        <a class="btn" href="{{ path(indexRoute) }}">Cancel</a>
     </form>
 </div>
-
+{% endblock %}

@@ -21,7 +21,7 @@ use Symfony\Component\Form\Form;
  */
 class CRUD implements ControllerProviderInterface
 {
-
+    var $templateLayout = 'layout.html.twig';
     var $entityClass;
     var $formClass;
     var $serviceName;
@@ -33,11 +33,16 @@ class CRUD implements ControllerProviderInterface
     var $afterUpdateEvent;
     var $beforeDeleteEvent;
     var $afterDeleteEvent;
-    /*var $indexTemplate;
-    var $readTemplate;
-    var $createTemplate;
-    var $updateTemplate;
-    var $deleteTemplate;*/
+    var $indexTemplate = "crud/resource_index.html.twig";
+    var $readTemplate = "crud/resource_read.html.twig";
+    var $createTemplate = "crud/resource_create.html.twig";
+    var $updateTemplate = "crud/resource_update.html.twig";
+    var $deleteTemplate = "crud/resource_delete.html.twig";
+    var $indexRoute;
+    var $readRoute;
+    var $createRoute;
+    var $updateRoute;
+    var $deleteRoute;
     var $indexCallback = "index";
     var $readCallback = "read";
     var $createCallback = "create";
@@ -50,9 +55,9 @@ class CRUD implements ControllerProviderInterface
     var $indexMethod = "findAll";
     var $userAware = FALSE;
     var $userEntityProperty = "user";
-    var $createSuccessMessage = "%s with id %s was created";
-    var $deleteSuccessMessage = "%s with id %s was deleted";
-    var $updateSuccessMessage = "%s with id %s was updated";
+    var $createSuccessMessage = "%s with id %s was created successfully !";
+    var $deleteSuccessMessage = "%s with id %s was deleted successfully !";
+    var $updateSuccessMessage = "%s with id %s was updated successfully !";
     // pagination
     var $limit = 20;
     var $order = array();
@@ -115,6 +120,21 @@ class CRUD implements ControllerProviderInterface
         if (NULL === $this->afterDeleteEvent) {
             $this->afterDeleteEvent = $this->resourceName + "_after_delete";
         }
+        if (NULL === $this->indexRoute) {
+            $this->indexRoute = "mp_crud_" . $this->resourceName . "_index";
+        }
+        if (NULL === $this->readRoute) {
+            $this->readRoute = "mp_crud_" . $this->resourceName . "_read";
+        }
+        if (NULL === $this->createRoute) {
+            $this->createRoute = "mp_crud_" . $this->resourceName . "_create";
+        }
+        if (NULL === $this->updateRoute) {
+            $this->updateRoute = "mp_crud_" . $this->resourceName . "_update";
+        }
+        if (NULL === $this->deleteRoute) {
+            $this->deleteRoute = "mp_crud_" . $this->resourceName . "_delete";
+        }
     }
 
     /**
@@ -128,23 +148,21 @@ class CRUD implements ControllerProviderInterface
         /** @var $controllers \Silex\ControllerCollection */
         $controllers = $app["controllers_factory"];
         // READ
-        $read = $controllers->match("/" . $this->resourceName . "/read/{id}/{format}", array($this, "$this->readCallback"))
-            ->value("format", "html")
+        $read = $controllers->match("/" . $this->resourceName . "/read/{id}", array($this, "$this->readCallback"))
+            ->assert("id", '\d+')
             ->bind("{$this->resourceName}_{$this->readCallback}");
         // CREATE
-        $controllers->match("/" . $this->resourceName . "/create/{format}", array($this, "$this->createCallback"))
-            ->value("format", "html")
+        $controllers->match("/" . $this->resourceName . "/create", array($this, "$this->createCallback"))
             ->bind("{$this->resourceName}_{$this->createCallback}");
         // UPDATE
-        $update = $controllers->match("/{$this->resourceName}/update/{id}/{format}", array($this, "$this->updateCallback"))
-            ->value("format", "html")
+        $update = $controllers->match("/{$this->resourceName}/update/{id}", array($this, "$this->updateCallback"))
+            ->assert("id", '\d+')
             ->bind("{$this->resourceName}_{$this->updateCallback}");
         // DELETE
-        $delete = $controllers->post("/{$this->resourceName}/delete/{id}/{format}", array($this, "$this->deleteCallback"))
-            ->value("format", "html")->bind("{$this->resourceName}_{$this->deleteCallback}");
-        $controllers->match("/" . $this->resourceName . "/{format}", array($this, "$this->indexCallback"))
-            ->value("format", "html")
-            ->assert('format', '\d+')
+        $delete = $controllers->post("/{$this->resourceName}/delete/{id}", array($this, "$this->deleteCallback"))
+            ->assert("id", '\d+')
+            ->bind("{$this->resourceName}_{$this->deleteCallback}");
+        $controllers->match("/" . $this->resourceName, array($this, "$this->indexCallback"))
             ->bind("{$this->resourceName}_{$this->indexCallback}");
         if (TRUE === $this->userAware) {
             $read->before(array($this, "mustBeOwner"));
@@ -154,7 +172,7 @@ class CRUD implements ControllerProviderInterface
         return $controllers;
     }
 
-    function index(Request $req, Application $app, $format)
+    function index(Request $req, Application $app)
     {
         $limit = $this->limit;
         $queryoffset = (int)$req->query->get("offset", 0);
@@ -167,10 +185,17 @@ class CRUD implements ControllerProviderInterface
             $resources = $app[$this->serviceName]->findAll(array(), array(), $limit, $offset);
         }
         return $app["twig"]
-            ->render("{$this->resourceName}_index.$format.twig",
+            ->render($this->indexTemplate,
             array("resources"       => $resources, "resource_limit" => $limit,
                   "resource_offset" => $queryoffset,
-                  "resource_count"  => count($resources)));
+                  "resource_count"  => count($resources),
+                  "layout"          => $this->templateLayout,
+                  "resourceName"    => $this->resourceName,
+                  "updateRoute"     => $this->updateRoute,
+                  "deleteRoute"     => $this->deleteRoute,
+                  "createRoute"     => $this->createRoute,
+                  "readRoute"       => $this->readRoute
+            ));
     }
 
     /**
@@ -181,17 +206,24 @@ class CRUD implements ControllerProviderInterface
      * @param Application $app
      * @param unknown $format
      */
-    function read($id, Request $req, Application $app, $format)
+    function read($id, Request $req, Application $app)
     {
         $resource = $app[$this->serviceName]->{$this->readMethod}($id);
+        $resource === NULL AND $app->abort(404, "resource not found");
+
         $reflect = new \ReflectionClass($this->entityClass);
         $properties = array_map(function ($prop) {
             /* @var $prop \ReflectionProperty */
             return $prop->getName();
         }, $reflect->getProperties());
         return $app["twig"]
-            ->render("{$this->resourceName}_read.$format.twig",
-            array("resourceName" => $this->resourceName, 'resource' => $resource, 'properties' => $properties));
+            ->render($this->readTemplate,
+            array(
+                "resourceName" => $this->resourceName,
+                'resource'     => $resource,
+                'properties'   => $properties,
+                "layout"       => $this->templateLayout
+            ));
     }
 
     /**
@@ -201,7 +233,7 @@ class CRUD implements ControllerProviderInterface
      * @param Request $req
      * @param string $format
      */
-    function create(Application $app, Request $req, $format)
+    function create(Application $app, Request $req)
     {
         $resource = new $this->entityClass();
         /* @var $form Form */
@@ -216,40 +248,47 @@ class CRUD implements ControllerProviderInterface
                     sprintf($this->createSuccessMessage, $this->resourceName,
                         $resource->getId()));
                 return $app->redirect($app['url_generator']
-                    ->generate("{$this->resourceName}_read", array("id" => $resource->getId())));
+                    ->generate($this->readRoute, array("id" => $resource->getId())));
             }
         }
         return $app["twig"]
-            ->render("{$this->resourceName}_create.$format.twig", array("form" => $form->createView()));
+            ->render($this->createTemplate, array(
+            "form" => $form->createView()
+        , "layout" => $this->templateLayout
+        ));
     }
 
     function delete(Application $app, Request $req, $format, $id)
     {
         $resource = $app[$this->serviceName]->{$this->readMethod}($id);
+        $resource === NULL AND $app->abort(404, "resource not found");
 
         if ("POST" === $req->getMethod()) {
             $app['dispatcher']->dispatch($this->beforeDeleteEvent, new GenericEvent($resource));
             $count = $app[$this->serviceName]->{$this->deleteMethod}($resource);
             $app['dispatcher']->dispatch($this->afterDeleteEvent, new GenericEvent($resource));
-            if ($count > 0) {
+            if ($count) {
                 $app["session"]->getFlashBag()->set("info", sprintf($this->deleteSuccessMessage, $this->resourceName, $id));
             } else {
                 $app->abort(500, "cannot delete the resource");
             }
-            return $app->redirect($app["url_generator"]->generate("{$this->resourceName}_index"));
+            return $app->redirect($this->indexRoute);
         } else {
-            return $app['twig']->render($this->resourceName . "_delete.$format.twig", array(
+            return $app['twig']->render($this->deleteTemplate, array(
                 "resourceName" => $this->resourceName,
                 "resource"     => $resource,
+                "layout"       => $this->templateLayout,
+                "indexRoute"   => $this->indexRoute
             ));
         }
 
 
     }
 
-    function update(Application $app, Request $req, $format, $id)
+    function update(Application $app, Request $req, $id)
     {
         $resource = $app[$this->serviceName]->find($id);
+        $resource === NULL AND $app->abort(404, "resource not found");
         /* @var $form \Symfony\Component\Form\Form */
         $form = $app["form.factory"]->create(new $this->formClass(), $resource);
         if ("POST" === $req->getMethod()) {
@@ -263,16 +302,18 @@ class CRUD implements ControllerProviderInterface
                     $this->resourceName, $resource->getId()));
                 return $app->redirect(
                     $app["url_generator"]
-                        ->generate("{$this->resourceName}_read",
+                        ->generate($this->readRoute,
                         array('id' => $resource->getId()))
                 );
             }
         }
         return $app["twig"]
-            ->render("{$this->resourceName}_update.$format.twig",
+            ->render($this->updateTemplate,
             array('form'         => $form->createView(),
                   "resource"     => $resource,
                   "resourceName" => $this->resourceName,
+                  "layout"       => $this->templateLayout,
+                  "indexRoute"   => $this->indexRoute
             ));
     }
 
