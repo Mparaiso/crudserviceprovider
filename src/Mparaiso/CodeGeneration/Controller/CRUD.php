@@ -24,7 +24,7 @@ class CRUD implements ControllerProviderInterface
     var $templateLayout = 'layout.html.twig';
     var $entityClass;
     var $formClass;
-    var $serviceName;
+    var $service;
     var $resourceName;
     var $collectionName;
     var $beforeCreateEvent;
@@ -53,6 +53,7 @@ class CRUD implements ControllerProviderInterface
     var $deleteMethod = "delete";
     var $readMethod = "find";
     var $indexMethod = "findAll";
+    var $countMethod = "count";
     var $userAware = FALSE;
     var $userEntityProperty = "user";
     var $createSuccessMessage = "%s with id %s was created successfully !";
@@ -69,7 +70,6 @@ class CRUD implements ControllerProviderInterface
      * possible values <br/>
      * var $entityClass;// the entity or model class <br/>
      * var $formClass; //the form type class<br/>
-     * var $serviceName; // for each resource a service that knows how to persist the resource must be defined<br/>
      * for instance : $app["resource_service"]. the service is a class that extends EntityService<br/>
      * var $resourceName; // the name of the resource <br/>
      * var $collectionName; // a collection name for a list of resource, for the index template <br/>
@@ -177,24 +177,21 @@ class CRUD implements ControllerProviderInterface
         $limit = $this->limit;
         $queryoffset = (int)$req->query->get("offset", 0);
         $offset = $queryoffset * $limit;
+        $resources = $this->service->{$this->indexMethod}(array(), array(), $limit, $offset);
+        $total = $this->service->{$this->countMethod}();
 
-        if ($this->userAware === TRUE) {
-            $user = $this->getCurrentUser($app["security"]);
-            $resources = $app[$this->serviceName]->findAll(array($this->userEntityProperty => $user), array(), $limit, $offset);
-        } else {
-            $resources = $app[$this->serviceName]->findAll(array(), array(), $limit, $offset);
-        }
         return $app["twig"]
             ->render($this->indexTemplate,
-            array("resources"       => $resources, "resource_limit" => $limit,
-                  "resource_offset" => $queryoffset,
-                  "resource_count"  => count($resources),
-                  "layout"          => $this->templateLayout,
-                  "resourceName"    => $this->resourceName,
-                  "updateRoute"     => $this->updateRoute,
-                  "deleteRoute"     => $this->deleteRoute,
-                  "createRoute"     => $this->createRoute,
-                  "readRoute"       => $this->readRoute
+            array("resources"    => $resources, "resource_limit" => $limit,
+                  "offset"       => $queryoffset,
+                  "limit"        => $this->limit,
+                  "total"        => $total,
+                  "layout"       => $this->templateLayout,
+                  "resourceName" => $this->resourceName,
+                  "updateRoute"  => $this->updateRoute,
+                  "deleteRoute"  => $this->deleteRoute,
+                  "createRoute"  => $this->createRoute,
+                  "readRoute"    => $this->readRoute
             ));
     }
 
@@ -208,7 +205,7 @@ class CRUD implements ControllerProviderInterface
      */
     function read($id, Request $req, Application $app)
     {
-        $resource = $app[$this->serviceName]->{$this->readMethod}($id);
+        $resource = $this->service->{$this->readMethod}($id);
         $resource === NULL AND $app->abort(404, "resource not found");
 
         $reflect = new \ReflectionClass($this->entityClass);
@@ -222,7 +219,9 @@ class CRUD implements ControllerProviderInterface
                 "resourceName" => $this->resourceName,
                 'resource'     => $resource,
                 'properties'   => $properties,
-                "layout"       => $this->templateLayout
+                "layout"       => $this->templateLayout,
+                "indexRoute"   => $this->indexRoute,
+                "updateRoute"  => $this->updateRoute
             ));
     }
 
@@ -242,7 +241,7 @@ class CRUD implements ControllerProviderInterface
             $form->bind($req);
             if ($form->isValid()) {
                 $app['dispatcher']->dispatch($this->beforeCreateEvent, new GenericEvent($resource));
-                $app[$this->serviceName]->{$this->createMethod}($resource);
+                $this->service->{$this->createMethod}($resource);
                 $app['dispatcher']->dispatch($this->afterCreateEvent, new GenericEvent($resource));
                 $app["session"]->getFlashBag()->add("info",
                     sprintf($this->createSuccessMessage, $this->resourceName,
@@ -253,25 +252,31 @@ class CRUD implements ControllerProviderInterface
         }
         return $app["twig"]
             ->render($this->createTemplate, array(
-            "form" => $form->createView()
-        , "layout" => $this->templateLayout
+            "resourceName" => $this->resourceName,
+            "form"         => $form->createView(),
+            "layout"       => $this->templateLayout,
+            "indexRoute"   => $this->indexRoute
         ));
     }
 
+    /**
+     * FR : supprime une resource
+     * EN : delete a resource
+     * @param \Silex\Application $app
+     * @param \Symfony\Component\HttpFoundation\Request $req
+     * @param $format
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     function delete(Application $app, Request $req, $format, $id)
     {
-        $resource = $app[$this->serviceName]->{$this->readMethod}($id);
+        $resource = $this->service->{$this->readMethod}($id);
         $resource === NULL AND $app->abort(404, "resource not found");
-
         if ("POST" === $req->getMethod()) {
             $app['dispatcher']->dispatch($this->beforeDeleteEvent, new GenericEvent($resource));
-            $count = $app[$this->serviceName]->{$this->deleteMethod}($resource);
+            $count = $this->service->{$this->deleteMethod}($resource);
             $app['dispatcher']->dispatch($this->afterDeleteEvent, new GenericEvent($resource));
-            if ($count) {
-                $app["session"]->getFlashBag()->set("info", sprintf($this->deleteSuccessMessage, $this->resourceName, $id));
-            } else {
-                $app->abort(500, "cannot delete the resource");
-            }
+            $app["session"]->getFlashBag()->set("info", sprintf($this->deleteSuccessMessage, $this->resourceName, $id));
             return $app->redirect($this->indexRoute);
         } else {
             return $app['twig']->render($this->deleteTemplate, array(
@@ -287,7 +292,7 @@ class CRUD implements ControllerProviderInterface
 
     function update(Application $app, Request $req, $id)
     {
-        $resource = $app[$this->serviceName]->find($id);
+        $resource = $this->service->find($id);
         $resource === NULL AND $app->abort(404, "resource not found");
         /* @var $form \Symfony\Component\Form\Form */
         $form = $app["form.factory"]->create(new $this->formClass(), $resource);
@@ -295,7 +300,7 @@ class CRUD implements ControllerProviderInterface
             $form->bind($req);
             if ($form->isValid()) {
                 $app['dispatcher']->dispatch($this->beforeUpdateEvent, new GenericEvent($resource));
-                $app[$this->serviceName]->{$this->updateMethod}($resource);
+                $this->service->{$this->updateMethod}($resource);
                 $app['dispatcher']->dispatch($this->afterUpdateEvent, new GenericEvent($resource));
                 $app["session"]->getFlashBag()
                     ->add("info", sprintf($this->updateSuccessMessage,
@@ -317,27 +322,11 @@ class CRUD implements ControllerProviderInterface
             ));
     }
 
-    /**
-     * FR : vérifie si un utilisateur est propriétaire d'une resource
-     * sinon , renvoie une erreur.<br/>
-     * EN : check if the current user own the resource before allowing a route callbackto be executed<br/>
-     * @param \Symfony\Component\HttpFoundation\Request $req
-     */
-    function mustBeOwner(Request $req, Application $app)
-    {
-        $id = $req->query->get("id");
-        if ($id) {
-            $user = $this->getCurrentUser($app["security"]);
-            $resource = $app[$this->serviceName]->findOne(array("id" => $id, $this->userEntityProperty => $user));
-            if (!$resource) {
-                return new Response("You cant access this resource", 403);
-            }
-        }
-    }
 
     function getCurrentUser(SecurityContext $security)
     {
         $user = $security->getToken()->getUser();
+
         return $user;
     }
 

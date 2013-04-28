@@ -32,5 +32,9 @@ class CrudServiceProvider implements ServiceProviderInterface
         $twigEnv->addTest(new \Twig_SimpleTest("datetime", function ($value) {
             return $value instanceof \DateTime;
         }));
+        $twigEnv->addTest(new \Twig_SimpleTest("scalar", "is_scalar"));
+        $twigEnv->addTest(new \Twig_SimpleTest("to_string", function ($value) {
+            return method_exists($value, "__toString");
+        }));
     }
 }

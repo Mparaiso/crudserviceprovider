@@ -1,36 +1,37 @@
-{% extends  layout  %}
+{% extends  layout %}
 {% block mp_crud_content %}
-<div class='Title'>Resource "{{ resource|default(resource.id) }}"</div>
-<div>
+    <div class='Title'>Resource "{{ resource|default(resource.id) }}"</div>
+    <div>
     <table class="span12">
-        <tbody>
-        {% for prop in properties %}
-            <tr>
+    <tbody>
+    {% for prop in properties %}
+        <tr>
 
-            <tr>
-                <td>
-                    {{ prop }} :
-                </td>
-                <td>
-<pre>
-<code>
+        <tr>
+        <td>
+            {{ prop }} :
+        </td>
+        <td>
+<pre><code>
 {% set _property= attribute(resource,prop) %}
 {% if _property is datetime %}
 {{ _property|date('r') }}
-{% else %}
+{% elseif _property is scalar %}
 {{ _property }}
-{% endif %}
-</code>
-</pre>
-
-                </td>
+{% elseif _property is to_string %}
+{{ _property }}
+{% else %}
+{{ _property|json_encode }}
+{% endif %}</code></pre>
+            </td>
             </tr>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div>
-    <a href="{{ path(resourceName~"_index") }}">{{ resourceName }} index</a>
-</div>
-{% endblock %}
+            {% endfor %}
+            </tbody>
+            </table>
+            </div>
+            <div>
+                <a href="{{ path(updateRoute,{id:resource.id}) }}" class="btn">Edit</a>
+                <a class="btn" href="{{ path(indexRoute) }}">{{ resourceName }} index</a>
+            </div>
+            {% endblock %}
