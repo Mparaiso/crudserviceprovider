@@ -2,7 +2,7 @@
 {% block mp_crud_content %}
 <h3>Update {{ resourceName|default('resource') }}</h3>
 <div>
-    <form method="POST" class=" form-actions" name="{{ form.vars.name }}">
+    <form method="POST" class=" form-actions" name="{{ form.vars.name }}" {{form_enctype(form)}} >
         <div class="controls span12">
             {{ form_widget(form,{"class":"input-block-level"}) }}
         </div>

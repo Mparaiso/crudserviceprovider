@@ -1,52 +1,69 @@
 {% extends layout %}
 {% block mp_crud_content %}
-    <h3>{{ resourceName }} index</h3>
+    <h3>{{ resourceName }} index
+        <small>  {{ total ~" "~resourceName|default('resource') }}(s) found.</small>
+    </h3>
     <div class="">
-        {% if resources is defined and total >0 %}
+        {% if resources is defined and resources|length >0 %}
             {% include 'crud/includes/pagination.html.twig' %}
             <div>
-                <form action="{{ path(createRoute) }}">
-                    <input type="submit" value="Add new" class='btn'>
-                </form>
+                <a href="{{ path(createRoute) }}" class='btn'>Add new </a>
             </div>
-            <table class="span12 table-hover table-striped table-condensed">
-                <thead>
-                <tr>
-                    <th>Page {{ offset+1 }}</th>
-                    <th>{{ resourceName|default("Resource") }}</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for resource in resources %}
+            <div>
+                <table class="span12 table-hover table-striped table-condensed font90">
+                    <thead>
                     <tr>
-                        <td>{{ loop.index + limit*offset }}</td>
-                        <td>
-                            <a href="{{ path(readRoute,{id:resource.id}) }}">{{ resource|default(resource.id) }}</a>
-                        </td>
-                        <td>
-                            <form action="{{ path(updateRoute,{id:resource.id,format:"html"}) }}" method="GET">
-                                <input type="submit" value="Update" class='btn btn-small'>
-                            </form>
-                        </td>
-                        <td>
-                            <form action="{{ path(deleteRoute,{id:resource.id,format:"html"}) }}" method="GET">
-                                <input type="submit" value="Delete" class='btn btn-small'>
-                            </form>
-                        </td>
+                        <th>Page {{ offset+1 }}</th>
 
+                        <th>{{ resourceName|default("Resource") }}</th>
+                        {% for prop in propertyList %}
+                            <th>
+                                {% if prop in orderList %}
+                                    <a href="?{{ prop }}={% if app.request.query.get(prop) == "ASC" %}DESC{% else %}ASC{% endif %}">{{ prop }}</a>
+                                {% else %}
+                                    {{ prop }}
+                                {% endif %}
+                            </th>
+                        {% endfor %}
+                        <th>Action</th>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {% for resource in resources %}
+                        <tr>
+                            <td>{{ loop.index + limit*offset }}</td>
+                            <td>
+                                <a href="{{ path(readRoute,{id:resource.id}) }}">{{ resource|default(resource.id) }}</a>
+                            </td>
+                            {% if propertyList is not null %}
+                                {% for prop in propertyList %}
+                                    <td>
+                                        {{ attribute(resource, prop) }}
+                                    </td>
+                                {% endfor %}
+                            {% endif %}
+                            <td>
+                                <a href="{{ path(updateRoute,{id:resource.id,format:"html"}) }}" class='btn btn-small'>
+                                    <i class='icon-pencil'></i> Edit
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ path(deleteRoute,{id:resource.id,format:"html"}) }}" class='btn btn-small'>
+                                    <i class="icon-remove"></i> Delete
+                                </a>
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             {% include 'crud/includes/pagination.html.twig' %}
         {% else %}
             No {{ resourceName|default('Resource') }} defined yet.
         {% endif %}
     </div>
     <div>
-        <form action="{{ path(createRoute) }}">
-            <input type="submit" value="Add new" class='btn'>
-        </form>
+        <a href="{{ path(createRoute) }}" class='btn'>Add new </a>
     </div>
 {% endblock %}

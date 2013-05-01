@@ -2,7 +2,8 @@
 {% block mp_crud_content %}
     <h3>Create {{ resourceName|default('resource') }}</h3>
     <div>
-        <form method="POST">
+        {# @note @symfony encoder le formulaire de la bonne manière afin de passer des champs de type input:file #}
+        <form method="POST" name="{{form.vars.name}}" {{ form_enctype(form) }} >
             {{ form_widget(form) }}
             <input class='btn' type="submit" value="Create">
             <input class='btn' type="reset" value="Reset">
