@@ -132,18 +132,18 @@ class CRUD implements ControllerProviderInterface {
         $controllers = $app["controllers_factory"];
         // READ
         $read = $controllers->match("/" . $this->resourceName . "/read/{id}", array($this, "$this->readCallback"))
-                ->assert("id", '\d+')
+                ->assert("id", '\d+|\w+')
                 ->bind($this->readRoute);
         // CREATE
         $controllers->match("/" . $this->resourceName . "/create", array($this, "$this->createCallback"))
                 ->bind($this->createRoute);
         // UPDATE
         $update = $controllers->match("/{$this->resourceName}/update/{id}", array($this, "$this->updateCallback"))
-                ->assert("id", '\d+')
+                ->assert("id", '\d+|\w+')
                 ->bind($this->updateRoute);
         // DELETE
         $delete = $controllers->post("/{$this->resourceName}/delete/{id}", array($this, "$this->deleteCallback"))
-                ->assert("id", '\d+')
+                ->assert("id", '\d+|\w+')
                 ->bind($this->deleteRoute);
 
         $index = $controllers->match("/" . $this->resourceName, array($this, "$this->indexCallback"))
