@@ -17,8 +17,7 @@
     "silex/silex": "*"
   },
   "require": {
-    "php": ">=5.3.3",
-     "doctrine/orm":"2.*"
+    "php": ">=5.3.3"
   },
   "suggest": {},
   "autoload": {
