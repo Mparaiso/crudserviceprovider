@@ -13,9 +13,6 @@
       "email": "mparaiso@online.fr"
     }
   ],
-  "require-dev": {
-    "silex/silex": "*"
-  },
   "require": {
     "php": ">=5.3.3"
   },
