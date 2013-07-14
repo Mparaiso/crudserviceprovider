@@ -41,7 +41,7 @@
                             {% if propertyList is not null %}
                                 {% for prop in propertyList %}
                                     <td>
-                                        {{ attribute(resource, prop) }}
+                                        {{ attribute(resource, prop)|toString }}
                                     </td>
                                 {% endfor %}
                             {% endif %}

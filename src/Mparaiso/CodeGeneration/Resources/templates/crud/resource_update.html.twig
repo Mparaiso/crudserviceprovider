@@ -1,14 +1,14 @@
 {% extends  layout %}
 {% block mp_crud_content %}
-<h3>Update {{ resourceName|default('resource') }}</h3>
-<div>
-    <form method="POST" class=" form-actions" name="{{ form.vars.name }}" {{form_enctype(form)}} >
-        <div class="controls span12">
-            {{ form_widget(form,{"class":"input-block-level"}) }}
-        </div>
-        <input class='btn' type="submit" value="Update">
-        <input class='btn' type="reset" value="Reset">
-        <a class="btn" href="{{ path(indexRoute) }}">Cancel</a>
-    </form>
-</div>
+    <h3>Update {{ resourceName|default('resource') }}</h3>
+    <div>
+        <form method="POST" class=" form-actions" name="{{ form.vars.name }}" {{ form_enctype(form) }} >
+            <div class="controls span12">
+                {% include formTemplate %}
+            </div>
+            <input class='btn' type="submit" value="Edit">
+            <input class='btn' type="reset" value="Reset">
+            <a class="btn" href="{{ path(indexRoute) }}">Cancel</a>
+        </form>
+    </div>
 {% endblock %}

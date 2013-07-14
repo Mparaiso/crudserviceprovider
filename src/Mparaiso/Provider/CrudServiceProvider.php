@@ -36,5 +36,24 @@ class CrudServiceProvider implements ServiceProviderInterface
         $twigEnv->addTest(new \Twig_SimpleTest("to_string", function ($value) {
             return method_exists($value, "__toString");
         }));
+
+        $toString = function ($value) {
+            if (method_exists($value, "__toString")) {
+                return call_user_func(array($value, "__toString"));
+            } elseif ($value instanceof \DateTime) {
+                return $value->format("r");
+            } elseif (is_scalar($value)) {
+                return $value;
+            } elseif ($value instanceof \ArrayAccess || is_array($value)) {
+                $res = "{ ";
+                foreach ($value as $val) {
+                    $res .= (string)$val . " ";
+                }
+                return $res . "}";
+            } else {
+                return json_encode($value);
+            }
+        };
+        $twigEnv->addFilter(new \Twig_SimpleFilter("toString", $toString));
     }
 }

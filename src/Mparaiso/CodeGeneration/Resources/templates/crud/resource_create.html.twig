@@ -3,8 +3,10 @@
     <h3>Create {{ resourceName|default('resource') }}</h3>
     <div>
         {# @note @symfony encoder le formulaire de la bonne manière afin de passer des champs de type input:file #}
-        <form method="POST" name="{{form.vars.name}}" {{ form_enctype(form) }} >
-            {{ form_widget(form) }}
+        <form method="POST" class="form-actions" name="{{ form.vars.name }}" {{ form_enctype(form) }} >
+            <div class="controls span12">
+                {% include formTemplate %}
+            </div>
             <input class='btn' type="submit" value="Create">
             <input class='btn' type="reset" value="Reset">
             <a class="btn" href="{{ path(indexRoute) }}">Cancel</a>
