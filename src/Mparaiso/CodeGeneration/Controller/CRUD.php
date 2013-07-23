@@ -290,7 +290,7 @@ class CRUD implements ControllerProviderInterface
             "resourceName" => $this->resourceName,
             "form" => $form->createView(),
             "layout" => $this->templateLayout,
-            "formTemplate"=>$this->formTemplate,
+            "formTemplate" => $this->formTemplate,
             "indexRoute" => $this->indexRoute
         ));
     }
@@ -351,7 +351,7 @@ class CRUD implements ControllerProviderInterface
             "resource" => $resource,
             "resourceName" => $this->resourceName,
             "layout" => $this->templateLayout,
-            "formTemplate"=>$this->formTemplate,
+            "formTemplate" => $this->formTemplate,
             "indexRoute" => $this->indexRoute
         ));
     }
