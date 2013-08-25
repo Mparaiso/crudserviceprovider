@@ -2,17 +2,15 @@
 
 namespace Mparaiso\CodeGeneration\Controller;
 
-use Silex\ControllerProviderInterface;
 use Mparaiso\CodeGeneration\Form\BulkType;
-use Symfony\Component\EventDispatcher\GenericEvent;
+use Mparaiso\CodeGeneration\Service\ICRUDService;
 use ReflectionClass;
-use ReflectionProperty;
+use Silex\Application;
+use Silex\ControllerProviderInterface;
+use Symfony\Component\EventDispatcher\GenericEvent;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\SecurityContext;
-use Silex\Application;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Form;
-use Mparaiso\CodeGeneration\Service\ICRUDService;
 
 /**
  * FR : classe générique pour un classique CRUD.
@@ -29,7 +27,8 @@ class CRUD implements ControllerProviderInterface
 
     public $entityClass;
     public $formClass;
-
+    // id
+    public $getIdMethod = "getId";
     /**
      *
      * @var ICRUDService
@@ -109,10 +108,10 @@ class CRUD implements ControllerProviderInterface
             $this->afterUpdateEvent = $this->resourceName . "_after_update";
         }
         if (NULL === $this->beforeDeleteEvent) {
-            $this->beforeDeleteEvent = $this->resourceName + "_before_delete";
+            $this->beforeDeleteEvent = $this->resourceName . "_before_delete";
         }
         if (NULL === $this->afterDeleteEvent) {
-            $this->afterDeleteEvent = $this->resourceName + "_after_delete";
+            $this->afterDeleteEvent = $this->resourceName . "_after_delete";
         }
         if (NULL === $this->indexRoute) {
             $this->indexRoute = "mp_crud_" . $this->resourceName . "_index";
@@ -196,8 +195,9 @@ class CRUD implements ControllerProviderInterface
         /* map ids and exchange keys and values */
         $map = array();
         foreach ($resources as $resource) {
-            $map[] = $resource->getId();
+            $map[] = (string)$resource->{$this->getIdMethod}();
         }
+        //$app["logger"]->log(print_r($map));
         $type = new BulkType(array_flip($map), $this->bulkActions);
         $bulkForm = $app['form.factory']->create($type);
         /* EN : execute bulk operations */
@@ -214,19 +214,19 @@ class CRUD implements ControllerProviderInterface
         }
         return $app["twig"]
             ->render($this->indexTemplate, array("resources" => $resources,
-            "offset" => $queryoffset,
-            "limit" => $this->limit,
-            "total" => $total,
-            "layout" => $this->templateLayout,
-            "resourceName" => $this->resourceName,
-            "updateRoute" => $this->updateRoute,
-            "deleteRoute" => $this->deleteRoute,
-            "createRoute" => $this->createRoute,
-            "readRoute" => $this->readRoute,
-            "propertyList" => $this->propertyList,
-            "orderList" => $this->orderList,
-            "bulkActionForm" => $bulkForm->createView(),
-        ));
+                "offset" => $queryoffset,
+                "limit" => $this->limit,
+                "total" => $total,
+                "layout" => $this->templateLayout,
+                "resourceName" => $this->resourceName,
+                "updateRoute" => $this->updateRoute,
+                "deleteRoute" => $this->deleteRoute,
+                "createRoute" => $this->createRoute,
+                "readRoute" => $this->readRoute,
+                "propertyList" => $this->propertyList,
+                "orderList" => $this->orderList,
+                "bulkActionForm" => $bulkForm->createView(),
+            ));
     }
 
     /**
@@ -251,13 +251,13 @@ class CRUD implements ControllerProviderInterface
         }
         return $app["twig"]
             ->render($this->readTemplate, array(
-            "resourceName" => $this->resourceName,
-            'resource' => $resource,
-            'properties' => $properties,
-            "layout" => $this->templateLayout,
-            "indexRoute" => $this->indexRoute,
-            "updateRoute" => $this->updateRoute
-        ));
+                "resourceName" => $this->resourceName,
+                'resource' => $resource,
+                'properties' => $properties,
+                "layout" => $this->templateLayout,
+                "indexRoute" => $this->indexRoute,
+                "updateRoute" => $this->updateRoute
+            ));
     }
 
     /**
@@ -280,19 +280,19 @@ class CRUD implements ControllerProviderInterface
                 $this->service->{$this->createMethod}($resource);
                 $app['dispatcher']->dispatch($this->afterCreateEvent, new GenericEvent($resource, array(
                     'form' => $form, "app" => $app, 'request' => $req)));
-                $app["session"]->getFlashBag()->add("info", sprintf($this->createSuccessMessage, $this->resourceName, $resource->getId()));
+                $app["session"]->getFlashBag()->add("info", sprintf($this->createSuccessMessage, $this->resourceName, $resource->{$this->getIdMethod}()));
                 return $app->redirect($app['url_generator']
-                    ->generate($this->readRoute, array("id" => $resource->getId())));
+                    ->generate($this->readRoute, array("id" => $resource->{$this->getIdMethod}())));
             }
         }
         return $app["twig"]
             ->render($this->createTemplate, array(
-            "resourceName" => $this->resourceName,
-            "form" => $form->createView(),
-            "layout" => $this->templateLayout,
-            "formTemplate" => $this->formTemplate,
-            "indexRoute" => $this->indexRoute
-        ));
+                "resourceName" => $this->resourceName,
+                "form" => $form->createView(),
+                "layout" => $this->templateLayout,
+                "formTemplate" => $this->formTemplate,
+                "indexRoute" => $this->indexRoute
+            ));
     }
 
     /**
@@ -341,9 +341,9 @@ class CRUD implements ControllerProviderInterface
                 $this->service->{$this->updateMethod}($resource);
                 $app['dispatcher']->dispatch($this->afterUpdateEvent, new GenericEvent($resource, array(
                     'form' => $form, "app" => $app)));
-                $app["session"]->getFlashBag()->add("info", sprintf($this->updateSuccessMessage, $this->resourceName, $resource->getId()));
+                $app["session"]->getFlashBag()->add("info", sprintf($this->updateSuccessMessage, $this->resourceName, $resource->{$this->getIdMethod}()));
                 return $app->redirect(
-                    $app["url_generator"]->generate($this->readRoute, array('id' => $resource->getId()))
+                    $app["url_generator"]->generate($this->readRoute, array('id' => $resource->{$this->getIdMethod}()))
                 );
             }
         }
