@@ -1,9 +1,9 @@
 <?php
 
-namespace Mparaiso\CodeGeneration\Controller;
+namespace Mparaiso\CRUD\Controller;
 
-use Mparaiso\CodeGeneration\Form\BulkType;
-use Mparaiso\CodeGeneration\Service\ICRUDService;
+use Mparaiso\Crud\BulkType;
+use Mparaiso\Crud\ICrudService;
 use ReflectionClass;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
@@ -19,14 +19,13 @@ use Symfony\Component\Security\Core\SecurityContext;
  * copyright 2013 M.Paraiso
  * contact mparaiso@online.fr
  */
-class CRUD implements ControllerProviderInterface
-{
+class CRUDController implements ControllerProviderInterface {
 
     public $templateLayout = 'crud/layout.html.twig';
     public $formTemplate = 'crud/includes/form.html.twig';
 
-    public $entityClass;
-    public $formClass;
+    public $model;
+    public $form;
     // id
     public $getIdMethod = "getId";
     /**
@@ -34,7 +33,7 @@ class CRUD implements ControllerProviderInterface
      * @var ICRUDService
      */
     public $service;
-    public $resourceName;
+    public $resource;
     public $collectionName;
     public $beforeCreateEvent;
     public $afterCreateEvent;
@@ -82,54 +81,53 @@ class CRUD implements ControllerProviderInterface
      * values can be passed in the constructor to configure the crud controller.
      * @param array $values
      */
-    function __construct(array $values = array())
-    {
+    function __construct(array $values = array()) {
         foreach ($values as $key => $value) {
             if (property_exists($this, $key)) {
                 $this->$key = $value;
             }
         }
         if (NULL === $this->collectionName)
-            $this->collectionName = $this->resourceName . "Collection";
+            $this->collectionName = $this->resource . "Collection";
         if (NULL === $this->beforeCreateEvent) {
-            $this->beforeCreateEvent = $this->resourceName . "_before_create";
+            $this->beforeCreateEvent = $this->resource . "_before_create";
         }
 
-        if (NULL === $this->resourceName)
-            throw new \Exception("resourceName cannot be null");
+        if (NULL === $this->resource)
+            throw new \Exception("resource cannot be null");
 
         if (NULL === $this->afterCreateEvent) {
-            $this->afterCreateEvent = $this->resourceName . "_after_create";
+            $this->afterCreateEvent = $this->resource . "_after_create";
         }
         if (NULL === $this->beforeUpdateEvent) {
-            $this->beforeUpdateEvent = $this->resourceName . "_before_update";
+            $this->beforeUpdateEvent = $this->resource . "_before_update";
         }
         if (NULL === $this->afterUpdateEvent) {
-            $this->afterUpdateEvent = $this->resourceName . "_after_update";
+            $this->afterUpdateEvent = $this->resource . "_after_update";
         }
         if (NULL === $this->beforeDeleteEvent) {
-            $this->beforeDeleteEvent = $this->resourceName . "_before_delete";
+            $this->beforeDeleteEvent = $this->resource . "_before_delete";
         }
         if (NULL === $this->afterDeleteEvent) {
-            $this->afterDeleteEvent = $this->resourceName . "_after_delete";
+            $this->afterDeleteEvent = $this->resource . "_after_delete";
         }
         if (NULL === $this->indexRoute) {
-            $this->indexRoute = "mp_crud_" . $this->resourceName . "_index";
+            $this->indexRoute = "mp_crud_" . $this->resource . "_index";
         }
         if (NULL === $this->readRoute) {
-            $this->readRoute = "mp_crud_" . $this->resourceName . "_read";
+            $this->readRoute = "mp_crud_" . $this->resource . "_read";
         }
         if (NULL === $this->createRoute) {
-            $this->createRoute = "mp_crud_" . $this->resourceName . "_create";
+            $this->createRoute = "mp_crud_" . $this->resource . "_create";
         }
         if (NULL === $this->updateRoute) {
-            $this->updateRoute = "mp_crud_" . $this->resourceName . "_update";
+            $this->updateRoute = "mp_crud_" . $this->resource . "_update";
         }
         if (NULL === $this->deleteRoute) {
-            $this->deleteRoute = "mp_crud_" . $this->resourceName . "_delete";
+            $this->deleteRoute = "mp_crud_" . $this->resource . "_delete";
         }
 
-        $this->bulkActionRoute = "mp_crud_" . $this->resourceName . "_bulk";
+        $this->bulkActionRoute = "mp_crud_" . $this->resource . "_bulk";
 
         if (NULL === $this->bulkActions) {
             $this->bulkActions = array(
@@ -144,42 +142,40 @@ class CRUD implements ControllerProviderInterface
      * @param \Silex\Application $app
      * @return \Silex\ControllerCollection
      */
-    function connect(Application $app)
-    {
+    function connect(Application $app) {
         /** @public $controllers \Silex\ControllerCollection */
         $controllers = $app["controllers_factory"];
         // READ
-        $read = $controllers->match("/" . $this->resourceName . "/read/{id}", array($this, "$this->readCallback"))
+        $read = $controllers->match("/" . $this->resource . "/read/{id}", array($this, "$this->readCallback"))
             ->assert("id", '\d+|\w+')
             ->bind($this->readRoute);
         // CREATE
-        $controllers->match("/" . $this->resourceName . "/create", array($this, "$this->createCallback"))
+        $controllers->match("/" . $this->resource . "/create", array($this, "$this->createCallback"))
             ->value('format', 'html')
             ->bind($this->createRoute);
         // UPDATE
-        $update = $controllers->match("/{$this->resourceName}/update/{id}", array($this, "$this->updateCallback"))
+        $update = $controllers->match("/{$this->resource}/update/{id}", array($this, "$this->updateCallback"))
             ->value('format', 'html')
             ->assert("id", '\d+|\w+')
             ->bind($this->updateRoute);
         // DELETE
-        $delete = $controllers->match("/{$this->resourceName}/delete/{id}", array($this, "$this->deleteCallback"))
+        $delete = $controllers->match("/{$this->resource}/delete/{id}", array($this, "$this->deleteCallback"))
             ->assert("id", '\d+|\w+')
             ->value('format', 'html')
             ->method('GET|POST')
             ->bind($this->deleteRoute);
 
-        $bulk = $controllers->post("/{$this->resourceName}/bulk", array($this, 'bulkAction'))
+        $bulk = $controllers->post("/{$this->resource}/bulk", array($this, 'bulkAction'))
             ->bind($this->bulkActionRoute);
 
-        $index = $controllers->match("/" . $this->resourceName, array($this, "$this->indexCallback"))
+        $index = $controllers->match("/" . $this->resource, array($this, "$this->indexCallback"))
             ->value('format', 'html')
             ->bind($this->indexRoute);
 
         return $controllers;
     }
 
-    function index(Request $req, Application $app)
-    {
+    function index(Request $req, Application $app) {
         $limit = $this->limit;
         $queryoffset = (int)$req->query->get("offset", 0);
         $order = array();
@@ -218,7 +214,7 @@ class CRUD implements ControllerProviderInterface
                 "limit" => $this->limit,
                 "total" => $total,
                 "layout" => $this->templateLayout,
-                "resourceName" => $this->resourceName,
+                "resourceName" => $this->resource,
                 "updateRoute" => $this->updateRoute,
                 "deleteRoute" => $this->deleteRoute,
                 "createRoute" => $this->createRoute,
@@ -237,12 +233,11 @@ class CRUD implements ControllerProviderInterface
      * @param Application $app
      * @param unknown $format
      */
-    function read($id, Request $req, Application $app)
-    {
+    function read($id, Request $req, Application $app) {
         $resource = $this->service->{$this->readMethod}($id);
         $resource === NULL AND $app->abort(404, "resource not found");
 
-        $reflect = new \ReflectionClass($this->entityClass);
+        $reflect = new \ReflectionClass($this->model);
         if (!$properties = $this->propertyList) {
             $properties = array_map(function ($prop) {
                 /* @public $prop \ReflectionProperty */
@@ -251,7 +246,7 @@ class CRUD implements ControllerProviderInterface
         }
         return $app["twig"]
             ->render($this->readTemplate, array(
-                "resourceName" => $this->resourceName,
+                "resourceName" => $this->resource,
                 'resource' => $resource,
                 'properties' => $properties,
                 "layout" => $this->templateLayout,
@@ -267,11 +262,10 @@ class CRUD implements ControllerProviderInterface
      * @param Request $req
      * @param string $format
      */
-    function create(Application $app, Request $req)
-    {
-        $resource = new $this->entityClass();
+    function create(Application $app, Request $req) {
+        $resource = new $this->model();
         /* @public $form Form */
-        $form = $app["form.factory"]->create(new $this->formClass(), $resource);
+        $form = $app["form.factory"]->create(new $this->form(), $resource);
         if ("POST" === $req->getMethod()) {
             $form->bind($req);
             if ($form->isValid()) {
@@ -287,7 +281,7 @@ class CRUD implements ControllerProviderInterface
         }
         return $app["twig"]
             ->render($this->createTemplate, array(
-                "resourceName" => $this->resourceName,
+                "resourceName" => $this->resource,
                 "form" => $form->createView(),
                 "layout" => $this->templateLayout,
                 "formTemplate" => $this->formTemplate,
@@ -304,8 +298,7 @@ class CRUD implements ControllerProviderInterface
      * @param $id
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    function delete(Application $app, Request $req, $format, $id)
-    {
+    function delete(Application $app, Request $req, $format, $id) {
         $resource = $this->service->{$this->readMethod}($id);
         $resource === NULL AND $app->abort(404, "resource not found");
         if ("POST" === $req->getMethod()) {
@@ -318,7 +311,7 @@ class CRUD implements ControllerProviderInterface
             return $app->redirect($app['url_generator']->generate($this->indexRoute));
         } else {
             return $app['twig']->render($this->deleteTemplate, array(
-                "resourceName" => $this->resourceName,
+                "resourceName" => $this->resource,
                 "resource" => $resource,
                 "layout" => $this->templateLayout,
                 "indexRoute" => $this->indexRoute
@@ -326,13 +319,12 @@ class CRUD implements ControllerProviderInterface
         }
     }
 
-    function update(Application $app, Request $req, $id)
-    {
+    function update(Application $app, Request $req, $id) {
         $resource = $this->service->find($id);
         if ($resource === NULL)
             $app->abort(404, "resource not found");
         /* @public $form \Symfony\Component\Form\Form */
-        $form = $app["form.factory"]->create(new $this->formClass(), $resource);
+        $form = $app["form.factory"]->create(new $this->form(), $resource);
         if ("POST" === $req->getMethod()) {
             $form->bind($req);
             if ($form->isValid()) {
@@ -349,15 +341,14 @@ class CRUD implements ControllerProviderInterface
         }
         return $app["twig"]->render($this->updateTemplate, array('form' => $form->createView(),
             "resource" => $resource,
-            "resourceName" => $this->resourceName,
+            "resourceName" => $this->resource,
             "layout" => $this->templateLayout,
             "formTemplate" => $this->formTemplate,
             "indexRoute" => $this->indexRoute
         ));
     }
 
-    function getCurrentUser(SecurityContext $security)
-    {
+    function getCurrentUser(SecurityContext $security) {
         $user = $security->getToken()->getUser();
 
         return $user;
@@ -369,8 +360,7 @@ class CRUD implements ControllerProviderInterface
      * @param array $ids
      * @return bool
      */
-    function bulkDelete(array $ids, Application $app)
-    {
+    function bulkDelete(array $ids, Application $app) {
         array_walk($ids, function ($id) use ($app) {
             $resource = $this->service->{$this->readMethod}($id);
             if ($resource != NULL) {

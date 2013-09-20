@@ -1,11 +1,11 @@
 <?php
 
-namespace Mparaiso\CodeGeneration\Service;
+namespace Mparaiso\Crud\Service;
 
 
 use Doctrine\Common\Persistence\ObjectManager;
 
-class CRUDService implements ICRUDService
+class CrudService implements ICrudService
 {
     protected $em;
     protected $class;

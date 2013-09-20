@@ -9,23 +9,16 @@ use Silex\ServiceProviderInterface;
  * FR : fournit des outils pour la génération de crud
  * EN : provide tools for crud generation
  */
-class CrudServiceProvider implements ServiceProviderInterface
-{
+class CrudServiceProvider implements ServiceProviderInterface {
 
-    function __construct($namespace = "mp")
-    {
-        $this->ns = $namespace;
-    }
 
-    public function register(Application $app)
-    {
+    public function register(Application $app) {
 
     }
 
-    public function boot(Application $app)
-    {
+    public function boot(Application $app) {
         $app['twig.loader.filesystem']->addPath(
-            __DIR__ . "/../CodeGeneration/Resources/templates/");
+            __DIR__ . "/../Crud/Resources/templates/");
 
         $twigEnv = $app['twig'];
         /* @var $twigEnv \Twig_Environment */

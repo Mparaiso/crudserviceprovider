@@ -1,6 +1,6 @@
 <?php
 
-namespace Mparaiso\CodeGeneration\Form;
+namespace Mparaiso\CRUD\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

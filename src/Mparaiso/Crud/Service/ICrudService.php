@@ -1,10 +1,10 @@
 <?php
 
-namespace Mparaiso\CodeGeneration\Service;
+namespace Mparaiso\CRUD\Service;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 
-interface ICRUDService extends ObjectRepository
+interface ICrudService extends ObjectRepository
 {
     function count();
 

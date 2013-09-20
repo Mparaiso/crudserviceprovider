@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Mparaiso\CodeGeneration\Service;
+namespace Mparaiso\Crud\Service;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
-class DoctrineMongoDBODMCRUDService implements ICRUDService, ObjectRepository
+class DoctrineMongoDBODMCrudService implements ICRUDService
 {
     /**
      * @var \Doctrine\ODM\MongoDB\DocumentManager
