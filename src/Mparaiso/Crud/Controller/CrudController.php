@@ -2,7 +2,7 @@
 
 namespace Mparaiso\CRUD\Controller;
 
-use Mparaiso\Crud\BulkType;
+use Mparaiso\Crud\Form\BulkType;
 use Mparaiso\Crud\ICrudService;
 use ReflectionClass;
 use Silex\Application;
